@@ -1,0 +1,18 @@
+language: python
+sudo: required
+python:
+  - "2.7"
+env:
+  global:
+    - TZ=Europe/Kiev
+cache:
+  directories:
+    - eggs
+before_install:
+  - ./bootstrap.sh
+install:
+  - bin/buildout -N
+script:
+  - bin/nosetests
+after_success:
+  - bin/coveralls
