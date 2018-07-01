@@ -3,6 +3,7 @@ from time import sleep
 import requests
 import logging
 
+logging.basicConfig()
 logger = logging.getLogger("RiskIndicatorBridge")
 
 
