@@ -207,10 +207,12 @@ class BridgeTest(unittest.TestCase):
                 'Authorization': 'Bearer 11111111111111111111111111111111'
             },
             json={
-                'reasons': ['indicator'],
-                'decision': {'description': u'1: Пояснення 1\n2: Пояснення 2\n3: Пояснення 3\n4: Пояснення 4'},
-                'procuringStages': ['planning', 'awarding'],
-                'tender_id': '4'
+                "data": {
+                    'reasons': ['indicator'],
+                    'decision': {'description': u'1: Пояснення 1\n2: Пояснення 2\n3: Пояснення 3\n4: Пояснення 4'},
+                    'procuringStages': ['planning', 'awarding'],
+                    'tender_id': '4'
+                }
             },
             timeout=bridge.request_timeout
         )

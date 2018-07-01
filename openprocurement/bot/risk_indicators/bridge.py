@@ -113,13 +113,15 @@ class RiskIndicatorBridge(object):
             "{}monitorings".format(self.monitors_host),
             method="post",
             json={
-                "tender_id": details["id"],
-                "reasons": ["indicator"],
-                "procuringStages": stages,
-                "decision": {
-                    "description": "\n".join(
-                        [u"{}: {}".format(i["indicatorId"], i["indicatorShortName"]) for i in indicators_info]
-                    )
+                "data": {
+                    "tender_id": details["id"],
+                    "reasons": ["indicator"],
+                    "procuringStages": stages,
+                    "decision": {
+                        "description": "\n".join(
+                            [u"{}: {}".format(i["indicatorId"], i["indicatorShortName"]) for i in indicators_info]
+                        )
+                    }
                 }
             },
             headers={
