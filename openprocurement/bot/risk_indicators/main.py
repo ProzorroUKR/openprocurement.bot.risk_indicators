@@ -9,12 +9,13 @@ import os
 logger = logging.getLogger("RiskIndicatorBridge")
 
 
-def main():
-    if len(sys.argv) < 2:
-        logger.critical("Config is not provided")
-        return
-
-    config_path = sys.argv[1]
+def main(config_path=None):
+    if config_path is None:
+        if len(sys.argv) < 2:
+            logger.critical("Config is not provided")
+            return
+        config_path = sys.argv[1]
+        
     if not os.path.isfile(config_path):
         logger.critical('Invalid configuration file')
         return
