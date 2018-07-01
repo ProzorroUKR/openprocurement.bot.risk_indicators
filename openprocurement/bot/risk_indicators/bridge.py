@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from time import sleep
+import traceback
 import requests
 import logging
 
@@ -32,6 +33,7 @@ class RiskIndicatorBridge(object):
                 self.process_risks()
             except Exception as e:
                 logger.error(e)
+                traceback.print_exc()
                 sleep_seconds = self.queue_error_interval
             else:
                 run_time = datetime.now() - start
@@ -48,6 +50,7 @@ class RiskIndicatorBridge(object):
                 self.process_risk(risk)
             except Exception as e:
                 logger.error(e)
+                traceback.print_exc()
                 errors += 1
 
         logger.info("Risk processing finished. Number of skipped: {}".format(errors))
