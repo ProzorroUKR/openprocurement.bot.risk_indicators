@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from openprocurement.bot.risk_indicators.bridge import RiskIndicatorBridge
 from datetime import timedelta
 import requests
@@ -42,22 +43,22 @@ indicators_info = [
     {
         "indicatorId": "1",
         "indicatorStage": "Award",
-        "indicatorShortName": "ShortName 1",
+        "indicatorShortName": u"Пояснення 1",
     },
     {
         "indicatorId": "2",
         "indicatorStage": "Tendering",
-        "indicatorShortName": "ShortName 2",
+        "indicatorShortName": u"Пояснення 2",
     },
     {
         "indicatorId": "3",
         "indicatorStage": "",
-        "indicatorShortName": "ShortName 3",
+        "indicatorShortName": u"Пояснення 3",
     },
 {
         "indicatorId": "4",
         "indicatorStage": "Something else",
-        "indicatorShortName": "ShortName 4",
+        "indicatorShortName": u"Пояснення 4",
     }
 ]
 
@@ -207,7 +208,7 @@ class BridgeTest(unittest.TestCase):
             },
             json={
                 'reasons': ['indicator'],
-                'decision': {'description': '1: ShortName 1\n2: ShortName 2\n3: ShortName 3\n4: ShortName 4'},
+                'decision': {'description': u'1: Пояснення 1\n2: Пояснення 2\n3: Пояснення 3\n4: Пояснення 4'},
                 'procuringStages': ['planning', 'awarding'],
                 'tender_id': '4'
             },

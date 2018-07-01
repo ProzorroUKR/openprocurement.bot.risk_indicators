@@ -118,7 +118,7 @@ class RiskIndicatorBridge(object):
                 "procuringStages": stages,
                 "decision": {
                     "description": "\n".join(
-                        ["{}: {}".format(i["indicatorId"], i["indicatorShortName"]) for i in indicators_info]
+                        [u"{}: {}".format(i["indicatorId"], i["indicatorShortName"]) for i in indicators_info]
                     )
                 }
             },
