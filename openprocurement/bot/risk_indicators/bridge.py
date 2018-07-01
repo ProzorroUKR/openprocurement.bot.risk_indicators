@@ -110,7 +110,7 @@ class RiskIndicatorBridge(object):
             stages = list(set(stages) & self.expected_stages)
 
         self.request(
-            "{}/monitorings".format(self.monitors_host),
+            "{}monitorings".format(self.monitors_host),
             method="post",
             json={
                 "tender_id": details["id"],

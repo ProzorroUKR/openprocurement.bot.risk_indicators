@@ -202,7 +202,7 @@ class BridgeTest(unittest.TestCase):
                 pass
 
         requests_mock.post.assert_called_once_with(
-            'https://audit-api-dev.prozorro.gov.ua/api/2.4//monitorings',
+            'https://audit-api-dev.prozorro.gov.ua/api/2.4/monitorings',
             headers={
                 'Authorization': 'Bearer 11111111111111111111111111111111'
             },
