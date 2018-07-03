@@ -100,14 +100,14 @@ class RiskIndicatorBridge(object):
             "Tendering": "planning",
             "Award": "awarding",
         }
-        stages = [stages_convert.get(i["indicatorStage"], i["indicatorStage"])
+        stages = {stages_convert.get(i["indicatorStage"], i["indicatorStage"])
                   for i in indicators_info
-                  if i["indicatorStage"]]
+                  if i["indicatorStage"]}
 
-        diff_stages = set(stages) - self.expected_stages
+        diff_stages = stages - self.expected_stages
         if diff_stages:
             logger.warning("Found unexpected stages: {}".format(diff_stages))
-            stages = list(set(stages) & self.expected_stages)
+            stages = set(stages) & self.expected_stages
 
         self.request(
             "{}monitorings".format(self.monitors_host),
@@ -116,7 +116,7 @@ class RiskIndicatorBridge(object):
                 "data": {
                     "tender_id": details["id"],
                     "reasons": ["indicator"],
-                    "procuringStages": stages,
+                    "procuringStages": list(stages),
                     "decision": {
                         "description": "\n".join(
                             [u"{}: {}".format(i["indicatorId"], i["indicatorShortName"]) for i in indicators_info]
