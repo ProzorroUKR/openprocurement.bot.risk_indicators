@@ -55,12 +55,28 @@ indicators_info = [
         "indicatorStage": "",
         "indicatorShortName": u"Пояснення 3",
     },
-{
+    {
         "indicatorId": "4",
         "indicatorStage": "Something else",
         "indicatorShortName": u"Пояснення 4",
+    },
+    {
+        "indicatorId": "5",
+        "indicatorStage": "Something else 2",
+        "indicatorShortName": u"Пояснення 5",
     }
 ]
+
+indicators = {
+    "lotIndicators": [
+        {"indicatorId": "1", "value": 1},
+        {"indicatorId": "2", "value": 0},
+    ],
+    "tenderIndicators": [
+        {"indicatorId": "3", "value": 0},
+        {"indicatorId": "4", "value": 1},
+    ],
+}
 
 
 def get_request_mock(url, **kwargs):
@@ -79,6 +95,7 @@ def get_request_mock(url, **kwargs):
             content = {
                 "id": tender_id,
                 "indicatorsInfo": indicators_info,
+                "indicators": indicators,
 
             }
     else:
@@ -209,11 +226,44 @@ class BridgeTest(unittest.TestCase):
             json={
                 "data": {
                     'reasons': ['indicator'],
-                    'decision': {'description': u'1: Пояснення 1\n2: Пояснення 2\n3: Пояснення 3\n4: Пояснення 4'},
-                    'procuringStages': ['planning', 'awarding'],
+                    'decision': {'description': u'1: Пояснення 1 (Спрацював)\n4: Пояснення 4 (Спрацював)\n'
+                                                u'2: Пояснення 2 (Не спрацював)\n3: Пояснення 3 (Не спрацював)'},
+                    'procuringStages': ['awarding'],
                     'tender_id': '4'
                 }
             },
             timeout=bridge.request_timeout
         )
+
+    @mock.patch("openprocurement.bot.risk_indicators.bridge.requests")
+    def test_start_monitoring(self, requests_mock):
+        post_mock = mock.Mock(return_value=mock.MagicMock(status_code=201))
+        requests_mock.post = post_mock
+
+        bridge = RiskIndicatorBridge(self.config)
+
+        details = {
+            "id": "f" * 32,
+            "indicators": indicators,
+            "indicatorsInfo": indicators_info
+        }
+
+        bridge.start_monitoring(details)
+        post_mock.assert_called_once_with(
+            'https://audit-api-dev.prozorro.gov.ua/api/2.4/monitorings',
+            headers={'Authorization': 'Bearer 11111111111111111111111111111111'},
+            json={
+                'data': {
+                    'reasons': ['indicator'],
+                    'decision': {
+                        'description': u'1: Пояснення 1 (Спрацював)\n4: Пояснення 4 (Спрацював)\n'
+                                       u'2: Пояснення 2 (Не спрацював)\n3: Пояснення 3 (Не спрацював)'
+                    },
+                    'procuringStages': ['awarding'],
+                    'tender_id': 'ffffffffffffffffffffffffffffffff',
+                }
+            },
+            timeout=bridge.request_timeout
+        )
+
 

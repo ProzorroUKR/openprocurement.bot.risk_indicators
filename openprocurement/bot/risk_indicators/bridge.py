@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from datetime import datetime, timedelta
 from time import sleep
 import traceback
@@ -93,16 +95,27 @@ class RiskIndicatorBridge(object):
         return response["data"]
 
     def start_monitoring(self, details):
-        indicators_info = details["indicatorsInfo"]
+        indicators_info = {i["indicatorId"]: i for i in details["indicatorsInfo"]}
+
+        indicators = [(i["indicatorId"], i["value"])
+                      for key in ("tenderIndicators", "lotIndicators")
+                      for i in details["indicators"].get(key)]
+        # first with value==True, then sort by id
+        indicators = list(sorted(indicators, key=lambda e: (not e[1], e[0])))
+
         # 'planning', 'awarding', 'contracting' - SAS API
         # 'Tendering', 'Award' - Indicators API
         stages_convert = {
             "Tendering": "planning",
             "Award": "awarding",
         }
-        stages = {stages_convert.get(i["indicatorStage"], i["indicatorStage"])
-                  for i in indicators_info
-                  if i["indicatorStage"]}
+        raw_stages = (
+            indicators_info.get(uid, {}).get("indicatorStage")
+            for uid, value in indicators
+            if value
+        )
+        stages = {stages_convert.get(stage, stage)
+                  for stage in raw_stages if stage}
 
         diff_stages = stages - self.expected_stages
         if diff_stages:
@@ -119,7 +132,13 @@ class RiskIndicatorBridge(object):
                     "procuringStages": list(stages),
                     "decision": {
                         "description": "\n".join(
-                            [u"{}: {}".format(i["indicatorId"], i["indicatorShortName"]) for i in indicators_info]
+                            [
+                                u"{}: {} ({})".format(
+                                    uid,
+                                    indicators_info.get(uid, {}).get("indicatorShortName", ""),
+                                    u"Спрацював" if value else u"Не спрацював"
+                                ) for uid, value in indicators
+                            ]
                         )
                     }
                 }
