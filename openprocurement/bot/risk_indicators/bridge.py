@@ -15,7 +15,6 @@ class RiskIndicatorBridge(object):
     def __init__(self, config):
         config = config["main"]
         self.indicators_host = config["indicators_host"]
-        self.queue_types = config.get("queue_types", ("high", "medium", "low"))
         self.queue_limit = config.get("queue_limit", 100)
 
         self.monitors_host = config["monitors_host"]
@@ -70,20 +69,18 @@ class RiskIndicatorBridge(object):
 
     @property
     def queue(self):
-        for queue_type in self.queue_types:
-            url = "{}indicators-queue/{}?limit={}&page=0".format(
-                self.indicators_host,
-                queue_type,
-                self.queue_limit,
-            )
+        url = "{}indicators-queue/?limit={}&page=0".format(
+            self.indicators_host,
+            self.queue_limit,
+        )
 
-            while url:
-                response = self.request(url)
-                data = response.get("data", [])
-                for risk in data:
-                    yield risk
+        while url:
+            response = self.request(url)
+            data = response.get("data", [])
+            for risk in data:
+                yield risk
 
-                url = response.get("pagination", {}).get("next_page", {}).get("url")
+            url = response.get("pagination", {}).get("next_page", {}).get("url")
 
     def get_item_details(self, item_id):
         url = "{}tenders/{}".format(self.indicators_host, item_id)

@@ -1,7 +1,5 @@
 main:
   indicators_host: "http://195.201.111.52:8026/api/v0.1/"
-  indicators_queue: "indicators-queue/"
-  indicators_details: "tenders/"
   monitors_host: "https://audit-api-dev.prozorro.gov.ua/api/2.4/"
   monitors_token: "11111111111111111111111111111111"
 

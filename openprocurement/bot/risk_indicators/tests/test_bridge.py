@@ -208,7 +208,6 @@ class BridgeTest(unittest.TestCase):
         requests_mock.post = mock.Mock(return_value=mock.MagicMock(status_code=201))
 
         bridge = RiskIndicatorBridge(self.config)
-        bridge.queue_types = ("high",)
 
         sleep_mock = mock.Mock()
         sleep_mock.side_effect = StopIteration
