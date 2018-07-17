@@ -137,7 +137,8 @@ class RiskIndicatorBridge(object):
                                 ) for uid, value in indicators
                             ]
                         )
-                    }
+                    },
+                    "riskIndicators": [uid for uid, value in indicators]
                 }
             },
             headers={
