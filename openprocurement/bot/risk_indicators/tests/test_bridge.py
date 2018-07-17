@@ -228,7 +228,8 @@ class BridgeTest(unittest.TestCase):
                     'decision': {'description': u'1: Пояснення 1 (Спрацював)\n4: Пояснення 4 (Спрацював)\n'
                                                 u'2: Пояснення 2 (Не спрацював)\n3: Пояснення 3 (Не спрацював)'},
                     'procuringStages': ['awarding'],
-                    'tender_id': '4'
+                    'tender_id': '4',
+                    'riskIndicators': ['1', '4', '2', '3']
                 }
             },
             timeout=bridge.request_timeout
@@ -260,6 +261,7 @@ class BridgeTest(unittest.TestCase):
                     },
                     'procuringStages': ['awarding'],
                     'tender_id': 'ffffffffffffffffffffffffffffffff',
+                    "riskIndicators": ['1', '4', '2', '3']
                 }
             },
             timeout=bridge.request_timeout
