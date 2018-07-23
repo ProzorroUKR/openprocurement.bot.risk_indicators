@@ -13,21 +13,25 @@ queue_data = [
     {
         "tenderId": "UA-1",
         "tenderOuterId": "1",
+        "tenderScore": 1.1,
         "topRisk": False,
     },
     {
         "tenderId": "UA-2",
         "tenderOuterId": "2",
+        "tenderScore": .5,
         "topRisk": True,
     },
     {
         "tenderId": "UA-3",
         "tenderOuterId": "3",
+        "tenderScore": .2,
         "topRisk": True,
     },
     {
         "tenderId": "UA-4",
         "tenderOuterId": "4",
+        "tenderScore": .099,
         "topRisk": True,
     },
 ]
@@ -229,7 +233,8 @@ class BridgeTest(unittest.TestCase):
                                                 u'2: Пояснення 2 (Не спрацював)\n3: Пояснення 3 (Не спрацював)'},
                     'procuringStages': ['awarding'],
                     'tender_id': '4',
-                    'riskIndicators': ['1', '4', '2', '3']
+                    'riskIndicators': ['1', '4', '2', '3'],
+                    'riskIndicatorsTotalImpact': 0.099,
                 }
             },
             timeout=bridge.request_timeout
@@ -247,8 +252,9 @@ class BridgeTest(unittest.TestCase):
             "indicators": indicators,
             "indicatorsInfo": indicators_info
         }
+        risk_info = {"tenderScore": 0.55}
 
-        bridge.start_monitoring(details)
+        bridge.start_monitoring(risk_info, details)
         post_mock.assert_called_once_with(
             'https://audit-api-dev.prozorro.gov.ua/api/2.4/monitorings',
             headers={'Authorization': 'Bearer 11111111111111111111111111111111'},
@@ -261,7 +267,8 @@ class BridgeTest(unittest.TestCase):
                     },
                     'procuringStages': ['awarding'],
                     'tender_id': 'ffffffffffffffffffffffffffffffff',
-                    "riskIndicators": ['1', '4', '2', '3']
+                    "riskIndicators": ['1', '4', '2', '3'],
+                    "riskIndicatorsTotalImpact": 0.55,
                 }
             },
             timeout=bridge.request_timeout
