@@ -63,7 +63,7 @@ class RiskIndicatorBridge(object):
 
             if not has_live_monitoring:
                 details = self.get_item_details(risk["tenderId"])
-                self.start_monitoring(details)
+                self.start_monitoring(risk, details)
 
     # Access APIs methods #
 
@@ -91,7 +91,7 @@ class RiskIndicatorBridge(object):
         response = self.request(url)
         return response["data"]
 
-    def start_monitoring(self, details):
+    def start_monitoring(self, risk_info, details):
         indicators_info = {i["indicatorId"]: i for i in details["indicatorsInfo"]}
 
         indicators = [(i["indicatorId"], i["value"])
@@ -138,7 +138,8 @@ class RiskIndicatorBridge(object):
                             ]
                         )
                     },
-                    "riskIndicators": [uid for uid, value in indicators]
+                    "riskIndicators": [uid for uid, value in indicators],
+                    "riskIndicatorsTotalImpact": risk_info.get("tenderScore"),
                 }
             },
             headers={
