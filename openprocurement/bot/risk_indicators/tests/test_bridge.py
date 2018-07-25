@@ -98,6 +98,7 @@ def get_request_mock(url, **kwargs):
             tender_id = url.split("/")[-1][3:]
             content = {
                 "id": tender_id,
+                'status': 'active.tendering',
                 "indicatorsInfo": indicators_info,
                 "indicators": indicators,
 
@@ -231,7 +232,7 @@ class BridgeTest(unittest.TestCase):
                     'reasons': ['indicator'],
                     'decision': {'description': u'1: Пояснення 1 (Спрацював)\n4: Пояснення 4 (Спрацював)\n'
                                                 u'2: Пояснення 2 (Не спрацював)\n3: Пояснення 3 (Не спрацював)'},
-                    'procuringStages': ['awarding'],
+                    'procuringStages': ['planning'],
                     'tender_id': '4',
                     'riskIndicators': ['1', '4', '2', '3'],
                     'riskIndicatorsTotalImpact': 0.099,
@@ -249,6 +250,7 @@ class BridgeTest(unittest.TestCase):
 
         details = {
             "id": "f" * 32,
+            'status': 'active.auction',
             "indicators": indicators,
             "indicatorsInfo": indicators_info
         }
