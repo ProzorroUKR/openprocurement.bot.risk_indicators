@@ -19,7 +19,6 @@ class RiskIndicatorBridge(object):
         self.monitors_host = config["monitors_host"]
         self.monitors_token = config["monitors_token"]
         self.skip_monitoring_statuses = config.get("skip_monitoring_statuses", ("active", "draft"))
-        self.expected_stages = {'planning', 'awarding', 'contracting'}
 
         self.run_interval = timedelta(seconds=config.get("run_interval", 24 * 3600))
         self.queue_error_interval = config.get("queue_error_interval", 30 * 60)
@@ -97,24 +96,28 @@ class RiskIndicatorBridge(object):
         # first with value==True, then sort by id
         indicators = list(sorted(indicators, key=lambda e: (not e[1], e[0])))
 
-        # 'planning', 'awarding', 'contracting' - SAS API
-        # 'Tendering', 'Award' - Indicators API
-        stages_convert = {
-            "Tendering": "planning",
-            "Award": "awarding",
-        }
-        raw_stages = (
-            indicators_info.get(uid, {}).get("indicatorStage")
-            for uid, value in indicators
-            if value
-        )
-        stages = {stages_convert.get(stage, stage)
-                  for stage in raw_stages if stage}
+        status_to_stages = {
+            'active.enquiries': 'planning',
+            'active.tendering' : 'planning',
+            'active' : 'planning',
 
-        diff_stages = stages - self.expected_stages
-        if diff_stages:
-            logger.warning("Found unexpected stages: {}".format(diff_stages))
-            stages = set(stages) & self.expected_stages
+            'active.pre-qualification': 'awarding',
+            'active.pre-qualification.stand-still': 'awarding',
+            'active.auction': 'awarding',
+            'active.qualification': 'awarding',
+            'active.awarded': 'awarding',
+            'award:status:active': 'awarding',
+
+            'unsuccessful': 'contracting',
+            'cancelled': 'contracting',
+            'complete': 'contracting',
+        }
+        try:
+            stages = [status_to_stages[details['status']]]
+        except KeyError:
+            logger.warning('Unable to match risk status "%s" to procuringStages: {}' % details['status'])
+            stages = []
+
 
         self.request(
             "{}monitorings".format(self.monitors_host),
