@@ -83,7 +83,7 @@ class RiskIndicatorBridge(object):
         return self.request(url)
 
     def get_tender_monitoring_list(self, tender_id):
-        url = "{}tenders/{}/monitorings".format(self.monitors_host, tender_id)
+        url = "{}tenders/{}/monitorings?mode=draft".format(self.monitors_host, tender_id)
         response = self.request(url)
         return response["data"]
 
