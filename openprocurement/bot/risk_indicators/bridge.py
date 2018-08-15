@@ -84,7 +84,12 @@ class RiskIndicatorBridge(object):
 
     def get_tender_monitoring_list(self, tender_id):
         url = "{}tenders/{}/monitorings?mode=draft".format(self.monitors_host, tender_id)
-        response = self.request(url)
+        response = self.request(
+            url,
+            headers={
+                "Authorization": "Bearer {}".format(self.monitors_token)
+            }
+        )
         return response["data"]
 
     def start_monitoring(self, risk_info, details):
