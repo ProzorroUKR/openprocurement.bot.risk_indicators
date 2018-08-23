@@ -2,6 +2,7 @@
 
 from datetime import datetime, timedelta
 from time import sleep
+from urllib import quote_plus
 import requests
 import logging
 
@@ -65,18 +66,25 @@ class RiskIndicatorBridge(object):
 
     @property
     def queue(self):
-        url = "{}indicators-queue/?limit={}&page=0".format(
-            self.indicators_host,
-            self.queue_limit,
-        )
+        regions = self.request("{}region-indicators-queue/regions/".format(self.indicators_host))
 
-        while url:
-            response = self.request(url)
-            data = response.get("data", [])
-            for risk in data:
-                yield risk
+        for region in regions:
+            page, total_pages = 0, 1
 
-            url = response.get("pagination", {}).get("next_page", {}).get("url")
+            while page < total_pages:
+                url = "{}region-indicators-queue/?region={}&limit={}&page={}".format(
+                    self.indicators_host,
+                    quote_plus(region.encode('utf-8')),
+                    self.queue_limit,
+                    page
+                )
+                response = self.request(url)
+                data = response.get("data", [])
+                for risk in data:
+                    yield risk
+
+                total_pages = response.get("pagination", {}).get("totalPages", 1)
+                page += 1
 
     def get_item_details(self, item_id):
         url = "{}tenders/{}".format(self.indicators_host, item_id)
@@ -103,8 +111,8 @@ class RiskIndicatorBridge(object):
 
         status_to_stages = {
             'active.enquiries': 'planning',
-            'active.tendering' : 'planning',
-            'active' : 'planning',
+            'active.tendering': 'planning',
+            'active': 'planning',
 
             'active.pre-qualification': 'awarding',
             'active.pre-qualification.stand-still': 'awarding',
@@ -122,7 +130,6 @@ class RiskIndicatorBridge(object):
         except KeyError:
             logger.warning('Unable to match risk status "%s" to procuringStages: {}' % details['status'])
             stages = []
-
 
         self.request(
             "{}monitorings".format(self.monitors_host),
@@ -145,6 +152,7 @@ class RiskIndicatorBridge(object):
                     },
                     "riskIndicators": [uid for uid, value in indicators],
                     "riskIndicatorsTotalImpact": risk_info.get("tenderScore"),
+                    "riskIndicatorsRegion": risk_info.get("region"),
                 }
             },
             headers={
@@ -167,14 +175,14 @@ class RiskIndicatorBridge(object):
             try:
                 response = func(url, timeout=timeout, **kwargs)
             except Exception as e:
-                logger.error(e)
+                logger.exception(e)
             else:
                 status_ok = 201 if method == "post" else 200
                 if response.status_code == status_ok:
                     try:
                         json_res = response.json()
                     except Exception as e:
-                        logger.error(e)
+                        logger.exception(e)
                     else:
                         return json_res
                 else:

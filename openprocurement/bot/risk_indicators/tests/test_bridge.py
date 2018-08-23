@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from openprocurement.bot.risk_indicators.bridge import RiskIndicatorBridge
 from datetime import timedelta
+from urlparse import urlparse, parse_qs
 import requests
 import unittest
 import logging.config
@@ -15,24 +16,28 @@ queue_data = [
         "tenderOuterId": "1",
         "tenderScore": 1.1,
         "topRisk": False,
+        "region": u"м. Київ",
     },
     {
         "tenderId": "UA-2",
         "tenderOuterId": "2",
         "tenderScore": .5,
         "topRisk": True,
+        "region": u"м. Київ",
     },
     {
         "tenderId": "UA-3",
         "tenderOuterId": "3",
         "tenderScore": .2,
         "topRisk": True,
+        "region": u"м. Київ",
     },
     {
         "tenderId": "UA-4",
         "tenderOuterId": "4",
         "tenderScore": .099,
         "topRisk": True,
+        "region": u"Севастополь",
     },
 ]
 
@@ -87,8 +92,17 @@ def get_request_mock(url, **kwargs):
     response = requests.Response()
     response.status_code = 200
 
-    if "indicators-queue" in url:
-        content = {"data": queue_data}
+    if "/region-indicators-queue/" in url:
+        if "/regions" in url:
+            content = [u"м. Київ", u"Севастополь"]
+        else:
+            parsed = urlparse(url)
+            region = parse_qs(parsed.query).get("region")
+            if region:
+                region = region[0].decode('utf-8')
+                content = {"data": [e for e in queue_data if e["region"] == region]}
+            else:
+                content = {"data": queue_data}
 
     elif "/tenders/" in url:
         if "/monitorings" in url:
@@ -236,6 +250,7 @@ class BridgeTest(unittest.TestCase):
                     'tender_id': '4',
                     'riskIndicators': ['1', '4', '2', '3'],
                     'riskIndicatorsTotalImpact': 0.099,
+                    'riskIndicatorsRegion': u"Севастополь",
                 }
             },
             timeout=bridge.request_timeout
@@ -252,9 +267,9 @@ class BridgeTest(unittest.TestCase):
             "id": "f" * 32,
             'status': 'active.auction',
             "indicators": indicators,
-            "indicatorsInfo": indicators_info
+            "indicatorsInfo": indicators_info,
         }
-        risk_info = {"tenderScore": 0.55}
+        risk_info = {"tenderScore": 0.55, "region": u"Ухтырка"}
 
         bridge.start_monitoring(risk_info, details)
         post_mock.assert_called_once_with(
@@ -268,9 +283,10 @@ class BridgeTest(unittest.TestCase):
                                        u'2: Пояснення 2 (Не спрацював)\n3: Пояснення 3 (Не спрацював)'
                     },
                     'procuringStages': ['awarding'],
-                    'tender_id': 'ffffffffffffffffffffffffffffffff',
+                    'tender_id': 'f' * 32,
                     "riskIndicators": ['1', '4', '2', '3'],
                     "riskIndicatorsTotalImpact": 0.55,
+                    "riskIndicatorsRegion": risk_info["region"],
                 }
             },
             timeout=bridge.request_timeout
