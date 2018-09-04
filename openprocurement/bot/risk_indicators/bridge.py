@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, timedelta
+from collections import defaultdict
 from time import sleep
 from urllib import quote_plus
 import requests
@@ -26,6 +27,8 @@ class RiskIndicatorBridge(object):
         self.request_retries = config.get("request_retries", 5)
         self.request_timeout = config.get("request_timeout", 10)
 
+        self.process_stats = defaultdict(int)
+
     def run(self):
         while True:
             start = datetime.now()
@@ -43,22 +46,29 @@ class RiskIndicatorBridge(object):
                 sleep(sleep_seconds)
 
     def process_risks(self):
-        errors = 0
+        self.process_stats = defaultdict(int)
+
         for risk in self.queue:
             try:
                 self.process_risk(risk)
             except Exception as e:
                 logger.exception(e)
-                errors += 1
+                self.process_stats["failed"] += 1
 
-        logger.info("Risk processing finished. Number of skipped: {}".format(errors))
+        logger.info("Risk processing finished: {}".format(dict(self.process_stats)))
 
     def process_risk(self, risk):
+        self.process_stats["processed"] += 1
+
         if risk["topRisk"]:
+            self.process_stats["processed_top"] += 1
+
             monitorings = self.get_tender_monitoring_list(risk["tenderOuterId"])
             has_live_monitoring = any(m["status"] in self.skip_monitoring_statuses for m in monitorings)
 
             if not has_live_monitoring:
+                self.process_stats["processed_to_start"] += 1
+
                 details = self.get_item_details(risk["tenderId"])
                 self.start_monitoring(risk, details)
 
@@ -159,6 +169,8 @@ class RiskIndicatorBridge(object):
                 "Authorization": "Bearer {}".format(self.monitors_token)
             }
         )
+
+        self.process_stats["created"] += 1
 
     # Helper methods #
 
