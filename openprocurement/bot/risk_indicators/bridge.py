@@ -19,7 +19,8 @@ class RiskIndicatorBridge(object):
         self.queue_limit = config.get("queue_limit", 100)
 
         self.monitors_host = config["monitors_host"]
-        self.monitors_token = config["monitors_token"]
+        self.monitors_user = config["monitors_user"]
+        self.monitors_pass = config["monitors_pass"]
         self.skip_monitoring_statuses = config.get("skip_monitoring_statuses", ("active", "draft"))
 
         self.run_interval = timedelta(seconds=config.get("run_interval", 24 * 3600))
@@ -104,9 +105,7 @@ class RiskIndicatorBridge(object):
         url = "{}tenders/{}/monitorings?mode=draft".format(self.monitors_host, tender_id)
         response = self.request(
             url,
-            headers={
-                "Authorization": "Bearer {}".format(self.monitors_token)
-            }
+            auth=(self.monitors_user, self.monitors_pass),
         )
         return response["data"]
 
@@ -165,9 +164,7 @@ class RiskIndicatorBridge(object):
                     "riskIndicatorsRegion": risk_info.get("region"),
                 }
             },
-            headers={
-                "Authorization": "Bearer {}".format(self.monitors_token)
-            }
+            auth=(self.monitors_user, self.monitors_pass),
         )
 
         self.process_stats["created"] += 1

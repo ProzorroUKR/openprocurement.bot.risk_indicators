@@ -238,9 +238,7 @@ class BridgeTest(unittest.TestCase):
 
         requests_mock.post.assert_called_once_with(
             'https://audit-api-dev.prozorro.gov.ua/api/2.4/monitorings',
-            headers={
-                'Authorization': 'Bearer 11111111111111111111111111111111'
-            },
+            auth=('risk_indicator_bot', 'test_risk_indicator_bot_token'),
             json={
                 "data": {
                     'reasons': ['indicator'],
@@ -274,7 +272,7 @@ class BridgeTest(unittest.TestCase):
         bridge.start_monitoring(risk_info, details)
         post_mock.assert_called_once_with(
             'https://audit-api-dev.prozorro.gov.ua/api/2.4/monitorings',
-            headers={'Authorization': 'Bearer 11111111111111111111111111111111'},
+            auth=('risk_indicator_bot', 'test_risk_indicator_bot_token'),
             json={
                 'data': {
                     'reasons': ['indicator'],
