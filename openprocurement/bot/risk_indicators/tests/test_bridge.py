@@ -2,6 +2,7 @@
 from openprocurement.bot.risk_indicators.bridge import RiskIndicatorBridge
 from datetime import timedelta
 from urlparse import urlparse, parse_qs
+from copy import deepcopy
 import requests
 import unittest
 import logging.config
@@ -291,5 +292,53 @@ class BridgeTest(unittest.TestCase):
             },
             timeout=bridge.request_timeout
         )
+
+    @mock.patch("openprocurement.bot.risk_indicators.bridge.requests")
+    def test_request_risk_api_without_proxy(self, requests_mock):
+        get_mock = mock.Mock(return_value=mock.MagicMock(status_code=200))
+        requests_mock.get = get_mock
+
+        bridge = RiskIndicatorBridge(self.config)
+        bridge.request(bridge.indicators_host + "some-path/")
+
+        get_mock.assert_called_once_with(
+            bridge.indicators_host + "some-path/",
+            timeout=bridge.request_timeout
+        )
+
+    @mock.patch("openprocurement.bot.risk_indicators.bridge.requests")
+    def test_request_risk_api_with_proxy(self, requests_mock):
+        get_mock = mock.Mock(return_value=mock.MagicMock(status_code=200))
+        requests_mock.get = get_mock
+
+        new_config = deepcopy(self.config)
+        new_config["main"]["indicators_proxy"] = "http://127.0.0.1:8080"
+
+        bridge = RiskIndicatorBridge(new_config)
+        bridge.request(bridge.indicators_host + "some-path/")
+
+        get_mock.assert_called_once_with(
+            bridge.indicators_host + "some-path/",
+            timeout=bridge.request_timeout,
+            proxies={'http': 'http://127.0.0.1:8080', 'https': 'http://127.0.0.1:8080'}
+        )
+
+    @mock.patch("openprocurement.bot.risk_indicators.bridge.requests")
+    def test_request_tender_api_with_proxy(self, requests_mock):
+        get_mock = mock.Mock(return_value=mock.MagicMock(status_code=200))
+        requests_mock.get = get_mock
+
+        new_config = deepcopy(self.config)
+        new_config["main"]["indicators_proxy"] = "http://127.0.0.1:8080"
+
+        bridge = RiskIndicatorBridge(new_config)
+        bridge.request(bridge.monitors_host + "some-path/")
+
+        get_mock.assert_called_once_with(
+            bridge.monitors_host + "some-path/",
+            timeout=bridge.request_timeout,
+        )
+
+
 
 

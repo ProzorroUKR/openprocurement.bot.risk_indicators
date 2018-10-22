@@ -16,6 +16,7 @@ class RiskIndicatorBridge(object):
     def __init__(self, config):
         config = config["main"]
         self.indicators_host = config["indicators_host"]
+        self.indicators_proxy = config.get("indicators_proxy")
         self.queue_limit = config.get("queue_limit", 100)
 
         self.monitors_host = config["monitors_host"]
@@ -178,6 +179,11 @@ class RiskIndicatorBridge(object):
         pass
 
     def request(self, url, method="get", **kwargs):
+        if url.startswith(self.indicators_host) and self.indicators_proxy:
+            kwargs.update(proxies={
+                "http": self.indicators_proxy,
+                "https": self.indicators_proxy,
+            })
 
         func = getattr(requests, method)
         timeout = kwargs.pop("timeout", self.request_timeout)
