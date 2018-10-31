@@ -249,7 +249,7 @@ class BridgeTest(unittest.TestCase):
                                                 u'2: Пояснення 2 (Не спрацював)\n3: Пояснення 3 (Не спрацював)'},
                     'procuringStages': ['planning'],
                     'tender_id': '4',
-                    'riskIndicators': ['1', '4', '2', '3'],
+                    'riskIndicators': ['1', '4'],
                     'riskIndicatorsTotalImpact': 0.099,
                     'riskIndicatorsRegion': u"Севастополь",
                 }
@@ -285,7 +285,7 @@ class BridgeTest(unittest.TestCase):
                     },
                     'procuringStages': ['awarding'],
                     'tender_id': 'f' * 32,
-                    "riskIndicators": ['1', '4', '2', '3'],
+                    "riskIndicators": ['1', '4'],
                     "riskIndicatorsTotalImpact": 0.55,
                     "riskIndicatorsRegion": risk_info["region"],
                 }
