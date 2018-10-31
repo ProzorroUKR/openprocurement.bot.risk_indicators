@@ -161,7 +161,7 @@ class RiskIndicatorBridge(object):
                             ]
                         )
                     },
-                    "riskIndicators": [uid for uid, value in indicators],
+                    "riskIndicators": [uid for uid, value in indicators if value],
                     "riskIndicatorsTotalImpact": risk_info.get("tenderScore"),
                     "riskIndicatorsRegion": risk_info.get("region"),
                 }
