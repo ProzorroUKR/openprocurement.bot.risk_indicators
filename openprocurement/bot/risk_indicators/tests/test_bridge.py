@@ -83,7 +83,7 @@ indicators = {
         {"indicatorId": "2", "value": 0},
     ],
     "tenderIndicators": [
-        {"indicatorId": "3", "value": 0},
+        {"indicatorId": "3", "value": -2},
         {"indicatorId": "4", "value": 1},
     ],
 }
