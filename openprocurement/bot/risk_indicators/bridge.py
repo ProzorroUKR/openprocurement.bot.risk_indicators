@@ -150,17 +150,6 @@ class RiskIndicatorBridge(object):
                     "tender_id": details["id"],
                     "reasons": ["indicator"],
                     "procuringStages": list(stages),
-                    "decision": {
-                        "description": "\n".join(
-                            [
-                                u"{}: {} ({})".format(
-                                    uid,
-                                    indicators_info.get(uid, {}).get("indicatorShortName", ""),
-                                    u"Спрацював" if value else u"Не спрацював"
-                                ) for uid, value in indicators
-                            ]
-                        )
-                    },
                     "riskIndicators": [uid for uid, value in indicators if value == 1],
                     "riskIndicatorsTotalImpact": risk_info.get("tenderScore"),
                     "riskIndicatorsRegion": risk_info.get("region"),
