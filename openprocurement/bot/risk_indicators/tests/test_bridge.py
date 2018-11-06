@@ -83,7 +83,7 @@ indicators = {
         {"indicatorId": "2", "value": 0},
     ],
     "tenderIndicators": [
-        {"indicatorId": "3", "value": 0},
+        {"indicatorId": "3", "value": -2},
         {"indicatorId": "4", "value": 1},
     ],
 }
@@ -245,11 +245,9 @@ class BridgeTest(unittest.TestCase):
             json={
                 "data": {
                     'reasons': ['indicator'],
-                    'decision': {'description': u'1: Пояснення 1 (Спрацював)\n4: Пояснення 4 (Спрацював)\n'
-                                                u'2: Пояснення 2 (Не спрацював)\n3: Пояснення 3 (Не спрацював)'},
                     'procuringStages': ['planning'],
                     'tender_id': '4',
-                    'riskIndicators': ['1', '4', '2', '3'],
+                    'riskIndicators': ['1', '4'],
                     'riskIndicatorsTotalImpact': 0.099,
                     'riskIndicatorsRegion': u"Севастополь",
                 }
@@ -279,13 +277,9 @@ class BridgeTest(unittest.TestCase):
             json={
                 'data': {
                     'reasons': ['indicator'],
-                    'decision': {
-                        'description': u'1: Пояснення 1 (Спрацював)\n4: Пояснення 4 (Спрацював)\n'
-                                       u'2: Пояснення 2 (Не спрацював)\n3: Пояснення 3 (Не спрацював)'
-                    },
                     'procuringStages': ['awarding'],
                     'tender_id': 'f' * 32,
-                    "riskIndicators": ['1', '4', '2', '3'],
+                    "riskIndicators": ['1', '4'],
                     "riskIndicatorsTotalImpact": 0.55,
                     "riskIndicatorsRegion": risk_info["region"],
                 }
