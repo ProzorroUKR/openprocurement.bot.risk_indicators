@@ -18,6 +18,7 @@ queue_data = [
         "tenderScore": 1.1,
         "topRisk": False,
         "region": u"м. Київ",
+        "impactCategory": "low",
     },
     {
         "tenderId": "UA-2",
@@ -25,6 +26,7 @@ queue_data = [
         "tenderScore": .5,
         "topRisk": True,
         "region": u"м. Київ",
+        "impactCategory": "medium",
     },
     {
         "tenderId": "UA-3",
@@ -32,6 +34,7 @@ queue_data = [
         "tenderScore": .2,
         "topRisk": True,
         "region": u"м. Київ",
+        "impactCategory": "high",
     },
     {
         "tenderId": "UA-4",
@@ -39,6 +42,7 @@ queue_data = [
         "tenderScore": .099,
         "topRisk": True,
         "region": u"Севастополь",
+        "impactCategory": "hell",
     },
 ]
 
@@ -54,26 +58,31 @@ indicators_info = [
         "indicatorId": "1",
         "indicatorStage": "Award",
         "indicatorShortName": u"Пояснення 1",
+        "lastCheckingDate": "2018-12-20T09:34:52.646Z",
     },
     {
         "indicatorId": "2",
         "indicatorStage": "Tendering",
         "indicatorShortName": u"Пояснення 2",
+        "lastCheckingDate": "2018-12-21T09:34:52.646Z",
     },
     {
         "indicatorId": "3",
         "indicatorStage": "",
         "indicatorShortName": u"Пояснення 3",
+        "lastCheckingDate": "2018-12-22T09:34:52.646Z",
     },
     {
         "indicatorId": "4",
         "indicatorStage": "Something else",
         "indicatorShortName": u"Пояснення 4",
+        "lastCheckingDate": "2018-12-23T09:34:52.646Z",
     },
     {
         "indicatorId": "5",
         "indicatorStage": "Something else 2",
         "indicatorShortName": u"Пояснення 5",
+        "lastCheckingDate": "2018-12-24T09:34:52.646Z",
     }
 ]
 
@@ -250,6 +259,9 @@ class BridgeTest(unittest.TestCase):
                     'riskIndicators': ['1', '4'],
                     'riskIndicatorsTotalImpact': 0.099,
                     'riskIndicatorsRegion': u"Севастополь",
+                    'riskIndicatorsImpactCategory': "hell",
+                    'riskIndicatorsLastChecks': {'1': '2018-12-20T09:34:52.646Z',
+                                                 '4': '2018-12-23T09:34:52.646Z'},
                 }
             },
             timeout=bridge.request_timeout
@@ -268,7 +280,7 @@ class BridgeTest(unittest.TestCase):
             "indicators": indicators,
             "indicatorsInfo": indicators_info,
         }
-        risk_info = {"tenderScore": 0.55, "region": u"Ухтырка"}
+        risk_info = {"tenderScore": 0.55, "region": u"Ухтырка", "impactCategory": "intermediate"}
 
         bridge.start_monitoring(risk_info, details)
         post_mock.assert_called_once_with(
@@ -282,6 +294,9 @@ class BridgeTest(unittest.TestCase):
                     "riskIndicators": ['1', '4'],
                     "riskIndicatorsTotalImpact": 0.55,
                     "riskIndicatorsRegion": risk_info["region"],
+                    "riskIndicatorsImpactCategory": risk_info["impactCategory"],
+                    "riskIndicatorsLastChecks": {'1': '2018-12-20T09:34:52.646Z',
+                                                 '4': '2018-12-23T09:34:52.646Z'},
                 }
             },
             timeout=bridge.request_timeout
