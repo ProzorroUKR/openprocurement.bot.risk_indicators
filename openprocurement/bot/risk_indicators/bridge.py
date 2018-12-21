@@ -117,6 +117,7 @@ class RiskIndicatorBridge(object):
         indicators = [(i["indicatorId"], i["value"])
                       for key in ("tenderIndicators", "lotIndicators")
                       for i in details["indicators"].get(key)]
+
         # first with value==True, then sort by id
         indicators = list(sorted(indicators, key=lambda e: (not e[1], e[0])))
 
@@ -142,6 +143,7 @@ class RiskIndicatorBridge(object):
             logger.warning('Unable to match risk status "%s" to procuringStages: {}' % details['status'])
             stages = []
 
+        triggered_risks = [uid for uid, value in indicators if value == 1]
         self.request(
             "{}monitorings".format(self.monitors_host),
             method="post",
@@ -150,9 +152,15 @@ class RiskIndicatorBridge(object):
                     "tender_id": details["id"],
                     "reasons": ["indicator"],
                     "procuringStages": list(stages),
-                    "riskIndicators": [uid for uid, value in indicators if value == 1],
+                    "riskIndicators": triggered_risks,
                     "riskIndicatorsTotalImpact": risk_info.get("tenderScore"),
                     "riskIndicatorsRegion": risk_info.get("region"),
+                    "riskIndicatorsImpactCategory": risk_info.get("impactCategory"),
+                    "riskIndicatorsLastChecks": {
+                        uid: indicators_info[uid].get("lastCheckingDate")
+                        for uid in triggered_risks
+                        if uid in indicators_info
+                    },
                 }
             },
             headers={
