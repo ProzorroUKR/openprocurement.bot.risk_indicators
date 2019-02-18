@@ -52,39 +52,34 @@ tender_monitoring_data = {
 indicators_info = [
     {
         "indicatorId": "1",
-        "indicatorStage": "Award",
         "indicatorShortName": u"Пояснення 1",
     },
     {
         "indicatorId": "2",
-        "indicatorStage": "Tendering",
         "indicatorShortName": u"Пояснення 2",
     },
     {
         "indicatorId": "3",
-        "indicatorStage": "",
         "indicatorShortName": u"Пояснення 3",
     },
     {
         "indicatorId": "4",
-        "indicatorStage": "Something else",
         "indicatorShortName": u"Пояснення 4",
     },
     {
         "indicatorId": "5",
-        "indicatorStage": "Something else 2",
         "indicatorShortName": u"Пояснення 5",
     }
 ]
 
 indicators = {
     "lotIndicators": [
-        {"indicatorId": "1", "value": 1},
-        {"indicatorId": "2", "value": 0},
+        {"indicatorCode": "1", "value": 1},
+        {"indicatorCode": "2", "value": 0},
     ],
     "tenderIndicators": [
-        {"indicatorId": "3", "value": -2},
-        {"indicatorId": "4", "value": 1},
+        {"indicatorCode": "3", "value": -2},
+        {"indicatorCode": "4", "value": 1},
     ],
 }
 

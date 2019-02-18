@@ -114,7 +114,7 @@ class RiskIndicatorBridge(object):
     def start_monitoring(self, risk_info, details):
         indicators_info = {i["indicatorId"]: i for i in details["indicatorsInfo"]}
 
-        indicators = [(i["indicatorId"], i["value"])
+        indicators = [(i["indicatorCode"], i["value"])
                       for key in ("tenderIndicators", "lotIndicators")
                       for i in details["indicators"].get(key)]
         # first with value==True, then sort by id
